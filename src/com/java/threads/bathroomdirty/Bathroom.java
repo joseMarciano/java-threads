@@ -1,0 +1,94 @@
+package com.java.threads.bathroomdirty;
+
+public class Bathroom {
+
+    private boolean isDirty = true;
+
+    public void doNumberOne() {
+        final var threadName = Thread.currentThread().getName();
+
+        System.out.printf("%s is knocking%n", threadName);
+
+        synchronized (this) {
+            System.out.printf("Getting in bathroom - %s%n", threadName);
+
+            if (isDirty) {
+                wait(threadName);
+            }
+
+            System.out.printf("Doing fast thing - %s%n", threadName);
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.printf("Washing hands - %s%n", threadName);
+            System.out.printf("Getting out - %s%n", threadName);
+        }
+    }
+
+    public void doNumberTwo() {
+        final var threadName = Thread.currentThread().getName();
+        System.out.printf("%s is knocking%n", threadName);
+
+        synchronized (this) {
+            System.out.printf("Getting in bathroom - %s%n", threadName);
+
+            if (isDirty) {
+                wait(threadName);
+            }
+
+            System.out.printf("Taking time doing things - %s%n", threadName);
+
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.printf("Washing hands - %s%n", threadName);
+            System.out.printf("Getting out - %s%n", threadName);
+        }
+
+    }
+
+    public void clear() {
+        final var threadName = Thread.currentThread().getName();
+
+        System.out.printf("%s is knocking%n", threadName);
+
+        synchronized (this) {
+            System.out.printf("Getting in bathroom - %s%n", threadName);
+
+            if(!this.isDirty) {
+                System.out.printf("Getting out - %s%n | bathroom is already clean", threadName);
+                return;
+            }
+
+            System.out.printf("CLEANING bathroom - %s%n", threadName);
+
+            try {
+                Thread.sleep(12000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            this.isDirty = false;
+            this.notifyAll(); // notify all waiting threads to getout wait status
+            System.out.printf("Getting out - %s%n", threadName);
+
+        }
+    }
+
+    private void wait(final String threadName) {
+
+        System.out.printf("%s thr bath is DIRTY!!%n", threadName);
+        try {
+            this.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}

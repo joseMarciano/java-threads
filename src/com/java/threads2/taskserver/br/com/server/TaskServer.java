@@ -2,6 +2,7 @@ package com.java.threads2.taskserver.br.com.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.concurrent.Executors;
 
 public class TaskServer {
 
@@ -10,14 +11,16 @@ public class TaskServer {
         System.out.println("---- Server is initializing...");
         final var server = new ServerSocket(9809);
 
+//        final var threadPool = Executors.newFixedThreadPool(4); // create a pool of fixed threads
+        final var threadPool = Executors.newCachedThreadPool(); // create a threads on demand and close if don't need
+
 
         while(true) {
             final var socket = server.accept();
             System.out.printf("New client is connected on port %s%n", socket.getPort());
 
             final var distributeTaskByThread = new DistributeTask(socket);
-            final var clientThread = new Thread(distributeTaskByThread);
-            clientThread.start();
+            threadPool.execute(distributeTaskByThread);
         }
 
 

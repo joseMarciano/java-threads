@@ -17,9 +17,9 @@ public class DistributeTask implements Runnable {
             System.out.printf("Distributing task in separated thread for socket %s%n", this.socket.getPort());
             final var inputClient = new Scanner(socket.getInputStream());
 
-            while(inputClient.hasNextLine()) {
+            while (inputClient.hasNextLine()) {
                 final var command = inputClient.nextLine();
-                System.out.println(command);
+                System.out.printf("RECEIVED OF %s -> %s%n", this.socket.getPort(), command);
             }
 
             inputClient.close();

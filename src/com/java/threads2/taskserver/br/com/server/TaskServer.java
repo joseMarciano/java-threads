@@ -16,7 +16,7 @@ public class TaskServer {
 
     private final ExecutorService threadPool;
 
-    private boolean isRunning;
+    private volatile boolean isRunning;
 
     public TaskServer() throws Exception {
         System.out.println("---- Server is initializing...");

@@ -4,6 +4,7 @@ import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TaskServer {
 
@@ -16,19 +17,21 @@ public class TaskServer {
 
     private final ExecutorService threadPool;
 
-    private volatile boolean isRunning;
+//    private volatile boolean isRunning;
+
+    private AtomicBoolean isRunning; // wrapper for volatile boolean;
 
     public TaskServer() throws Exception {
         System.out.println("---- Server is initializing...");
         this.serverSocket = new ServerSocket(9809);
         this.threadPool = Executors.newCachedThreadPool(); // create a threads on demand and close if don't need
-        this.isRunning = false;
+        this.isRunning = new AtomicBoolean(false);
 
     }
 
     public void run() throws Exception {
-        this.isRunning = true;
-        while (this.isRunning) {
+        this.isRunning.set(true);
+        while (this.isRunning.get()) {
             try {
                 final var socket = this.serverSocket.accept();
                 System.out.printf("New client is connected on port %s%n", socket.getPort());
@@ -43,7 +46,7 @@ public class TaskServer {
     }
 
     public void stop() throws Exception {
-        this.isRunning = false;
+        this.isRunning.set(false);
         this.serverSocket.close();
         this.threadPool.shutdown();
     }

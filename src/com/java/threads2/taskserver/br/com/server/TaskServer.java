@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 
 public class TaskServer {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 
         System.out.println("---- Server is initializing...");
         final var server = new ServerSocket(9809);
@@ -14,6 +14,10 @@ public class TaskServer {
         while(true) {
             final var socket = server.accept();
             System.out.printf("New client is connected on port %s%n", socket.getPort());
+
+            final var distributeTaskByThread = new DistributeTask(socket);
+            final var clientThread = new Thread(distributeTaskByThread);
+            clientThread.start();
         }
 
 

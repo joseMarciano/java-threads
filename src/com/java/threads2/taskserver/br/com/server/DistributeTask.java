@@ -6,9 +6,11 @@ import java.util.Scanner;
 
 public class DistributeTask implements Runnable {
     private final Socket socket;
+    private final TaskServer taskServer;
 
-    public DistributeTask(final Socket socket) {
+    public DistributeTask(final Socket socket, final TaskServer taskServer) {
         this.socket = socket;
+        this.taskServer = taskServer;
     }
 
     @Override
@@ -35,10 +37,14 @@ public class DistributeTask implements Runnable {
 
     }
 
-    private static void extracted(final PrintStream outputClient, final String command) {
+    private void extracted(final PrintStream outputClient, final String command) throws Exception {
         switch (command) {
             case "c1" -> outputClient.println("COMMAND C1 RECEIVED");
             case "c2" -> outputClient.println("COMMAND C2 RECEIVED");
+            case "shut down" -> {
+                outputClient.println("Shutting down server");
+                this.taskServer.stop();
+            }
             default -> outputClient.println("COMMAND NOT FOUND");
         }
     }

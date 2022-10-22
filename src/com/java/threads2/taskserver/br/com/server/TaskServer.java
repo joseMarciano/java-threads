@@ -36,7 +36,7 @@ public class TaskServer {
                 final var socket = this.serverSocket.accept();
                 System.out.printf("New client is connected on port %s%n", socket.getPort());
 
-                final var distributeTaskByThread = new DistributeTask(socket, this);
+                final var distributeTaskByThread = new DistributeTask(socket, this, this.threadPool);
                 this.threadPool.execute(distributeTaskByThread);
 
             } catch (SocketException e) { // TODO: REVIEW

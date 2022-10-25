@@ -5,6 +5,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.Math.abs;
 
@@ -17,9 +21,38 @@ public class Main {
 
         final var resultImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-        recolorSingleThreaded(originalImage, resultImage);
+        long startTime = System.currentTimeMillis();
+//        recolorSingleThreaded(originalImage, resultImage);
+        recolorMultiThreaded(originalImage, resultImage, 5);
+        long endTime = System.currentTimeMillis();
 
         ImageIO.write(resultImage, "jpg", new File(DESTINATION_FILE));
+        System.out.println("SingleThread time: " + (endTime - startTime));
+    }
+
+    public static void recolorMultiThreaded(BufferedImage originalImage, BufferedImage resultImage, int numberOfThreads) throws Exception{
+        List<Thread> threads = new ArrayList<>();
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight() / numberOfThreads;
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            final int threadMultiplier = i;
+
+            final var thread = new Thread(() -> {
+                int leftCorner = 0;
+                int topCorner = height * threadMultiplier;
+
+                recolorImage(originalImage, resultImage, leftCorner, topCorner, width, height);
+
+            });
+
+            threads.add(thread);
+        }
+
+        threads.forEach(Thread::start);
+        for (Thread thread : threads) { // join threads to main
+            thread.join();
+        }
     }
 
     public static void recolorSingleThreaded(BufferedImage originalImage, BufferedImage resultImage){
